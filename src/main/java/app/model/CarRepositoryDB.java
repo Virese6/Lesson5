@@ -28,8 +28,8 @@ public class CarRepositoryDB implements CarRepository{
     public Car save(Car car) {
         try (Connection connection = getConnection()){
 
-            String query = String.format("INSERT INTO car (brand, price, year) VALUES ('%s', %d, %d)", car.getBrand(),
-                    car.getPrice(), car.getYear());
+            String query = String.format("INSERT INTO car (brand, price, year) VALUES ('%s', %.2f, %d)",
+                    car.getBrand(), car.getPrice(), car.getYear());
             Statement statement = connection.createStatement();
             statement.executeUpdate(query);
 
@@ -61,7 +61,7 @@ public class CarRepositoryDB implements CarRepository{
     @Override
     public void update(Car car) {
         try (Connection connection = getConnection()){
-            String query = String.format("UPDATE car SET brand =%s, price =%d, year =%d WHERE id =%d",
+            String query = String.format("UPDATE car SET brand =%s, price =%.2f, year =%d WHERE id =%d",
                     car.getBrand(),car.getPrice(),car.getYear(),car.getId());
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1,car.getBrand());
@@ -85,9 +85,9 @@ public class CarRepositoryDB implements CarRepository{
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()){
-                String brand = resultSet.getString("brand");
-                BigDecimal price = resultSet.getBigDecimal("price");
-                int year = resultSet.getInt("year");
+                String brand = resultSet.getString(2);
+                BigDecimal price = resultSet.getBigDecimal(3);
+                int year = resultSet.getInt(4);
 
                 cars.add(new Car(resultSet.getLong("id"),brand,price,year));
             }
@@ -104,7 +104,7 @@ public class CarRepositoryDB implements CarRepository{
 
             String query = String.format("DELETE FROM car WHERE id=%d", id);
             Statement statement = connection.createStatement();
-            int rowsDeleted = statement.executeUpdate(query);
+            statement.execute(query);
 
         }catch (Exception e){
             throw new RuntimeException(e);

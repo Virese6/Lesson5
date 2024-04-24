@@ -3,7 +3,8 @@ package app.controller;
 
 import app.model.Car;
 import app.model.CarRepository;
-import app.model.CarRepositoryDB;
+import app.model.CarRepositoryHibernate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,11 +12,10 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
 import java.util.Map;
 
 public class CarServlet extends HttpServlet {
-    private CarRepository repository = new CarRepositoryDB();
+    private CarRepository repository = new CarRepositoryHibernate();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -38,27 +38,18 @@ public class CarServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String brand = req.getParameter("brand");
-        BigDecimal price = new BigDecimal(req.getParameter("price"));
-        int year = Integer.parseInt(req.getParameter("year"));
-
-        Car car = new Car(brand, price, year);
-
-        Car savedCar = repository.save(car);
-
-        PrintWriter out = resp.getWriter();
+        ObjectMapper mapper = new ObjectMapper();
+        Car car = mapper.readValue(req.getReader(), Car.class);
+        repository.save(car);
+        PrintWriter writer = resp.getWriter();
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String brand = req.getParameter("brand");
-        BigDecimal price = new BigDecimal(req.getParameter("price"));
-        int year = Integer.parseInt(req.getParameter("year"));
 
-        Car car = new Car(brand, price, year);
-
+        ObjectMapper mapper = new ObjectMapper();
+        Car car = mapper.readValue(req.getReader(), Car.class);
         repository.update(car);
-
-        PrintWriter out = resp.getWriter();
+        PrintWriter writer = resp.getWriter();
     }
 }
