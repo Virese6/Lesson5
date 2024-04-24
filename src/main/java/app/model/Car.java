@@ -21,6 +21,19 @@ public class Car {
         this.year = year;
     }
 
+    public Car() {
+
+    }
+
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
     public String getBrand() {
         return brand;
     }
